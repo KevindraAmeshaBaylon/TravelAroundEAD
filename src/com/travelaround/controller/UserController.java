@@ -44,4 +44,32 @@ public class UserController {
         }
         return null; // Credential verification failed
     }
+
+        // Method to count total rows in any given table dynamically
+    public int getSystemCount(String tableName) {
+        String query = "SELECT COUNT(*) FROM " + tableName;
+        try (PreparedStatement ps = conn.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.out.println("Analytics error for " + tableName + ": " + e.getMessage());
+        }
+        return 0;
+    }
+
+    // Method to sum total booking revenue generated 
+    public double getTotalRevenue() {
+        String query = "SELECT SUM(total_cost) FROM Bookings WHERE booking_status = 'Confirmed'";
+        try (PreparedStatement ps = conn.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        } catch (SQLException e) {
+            System.out.println("Revenue calculation error: " + e.getMessage());
+        }
+        return 0.0;
+    }
 }

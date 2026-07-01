@@ -121,7 +121,10 @@ public class LoginForm extends javax.swing.JFrame {
                 javax.swing.JOptionPane.INFORMATION_MESSAGE);
         
         // TODO: Redirect user to their respective Role-Specific Dashboard next!
-        this.dispose(); // Close the login window
+        // Pass user data forward to initialize the active data board dashboard
+        com.travelaround.view.DashboardForm systemDashboard = new com.travelaround.view.DashboardForm(authenticatedUser);
+        systemDashboard.setLocationRelativeTo(null);
+        systemDashboard.setVisible(true);
     } else {
         javax.swing.JOptionPane.showMessageDialog(this, 
                 "Invalid username or password. Please try again.", 
