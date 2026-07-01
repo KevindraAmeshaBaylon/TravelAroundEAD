@@ -5,24 +5,24 @@ import com.travelaround.model.User;
 
 public class MainApplication {
     public static void main(String[] args) {
-        System.out.println("========== Launching TravelAround App ==========");
-        
-        // Initialize the controller
-        UserController userController = new UserController();
-        
-        // Test system using our default admin account from the SQL setup script
-        System.out.println("\nTesting database connection with account: admin...");
-        User testUser = userController.loginUser("admin", "admin123");
-        
-        if (testUser != null) {
-            System.out.println(">>> SUCCESS! Account Found <<<");
-            System.out.println("Welcome back: " + testUser.getUsername());
-            System.out.println("System Security Clearance Role: " + testUser.getRole());
-        } else {
-            System.out.println(">>> FAILURE! Could not read test user from the database. <<<");
-            System.out.println("Tip: Check that XAMPP is running and database tables were generated.");
+       try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Theme application failed: " + e.getMessage());
         }
-        
-        System.out.println("\n================================================");
+
+        // Run the visual Login window interface
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                com.travelaround.view.LoginForm loginWindow = new com.travelaround.view.LoginForm();
+                loginWindow.setLocationRelativeTo(null); // Centers the frame perfectly on screen
+                loginWindow.setVisible(true);
+            }
+        });
     }
 }
