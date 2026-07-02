@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package com.travelaround.view;
 
-/**
- *
- * @author kevin
- */
 public class DashboardForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DashboardForm.class.getName());
@@ -57,6 +49,7 @@ public class DashboardForm extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         lblTotalRevenue = new javax.swing.JLabel();
         btnLogout = new javax.swing.JButton();
+        btnBookRoom = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -198,6 +191,10 @@ public class DashboardForm extends javax.swing.JFrame {
         btnLogout.setText("LogOut");
         btnLogout.addActionListener(this::btnLogoutActionPerformed);
 
+        btnBookRoom.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnBookRoom.setText("Book");
+        btnBookRoom.addActionListener(this::btnBookRoomActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -221,6 +218,8 @@ public class DashboardForm extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 421, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnBookRoom)
+                        .addGap(26, 26, 26)
                         .addComponent(btnLogout)
                         .addGap(40, 40, 40))))
         );
@@ -230,7 +229,8 @@ public class DashboardForm extends javax.swing.JFrame {
                 .addGap(24, 24, 24)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(btnLogout))
+                    .addComponent(btnLogout)
+                    .addComponent(btnBookRoom))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblUserWelcome)
                 .addGap(18, 18, 18)
@@ -252,7 +252,14 @@ public class DashboardForm extends javax.swing.JFrame {
         loginWindow.setVisible(true); // Return back to core security clearance gate
     }//GEN-LAST:event_btnLogoutActionPerformed
 
+    private void btnBookRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBookRoomActionPerformed
+        BookingForm bookingScreen = new BookingForm();
+        bookingScreen.setLocationRelativeTo(null);
+        bookingScreen.setVisible(true);
+    }//GEN-LAST:event_btnBookRoomActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBookRoom;
     private javax.swing.JButton btnLogout;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
