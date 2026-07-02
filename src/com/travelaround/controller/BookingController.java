@@ -69,4 +69,30 @@ public class BookingController {
             return false;
         }
     }
+    
+        /**
+        * Fetches all booking transaction records to display on the master log view.
+        */
+       public java.util.List<com.travelaround.model.Booking> getAllBookings() {
+           java.util.List<com.travelaround.model.Booking> bookingList = new java.util.ArrayList<>();
+           String query = "SELECT * FROM Bookings";
+
+           try (Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(query)) {
+               while (rs.next()) {
+                   bookingList.add(new com.travelaround.model.Booking(
+                       rs.getInt("booking_id"),
+                       rs.getInt("customer_id"),
+                       rs.getInt("room_id"),
+                       rs.getDate("check_in_date"),
+                       rs.getDate("check_out_date"),
+                       rs.getDouble("total_cost"),
+                       rs.getString("booking_status")
+                   ));
+               }
+           } catch (SQLException e) {
+               System.out.println("Error pulling transaction files: " + e.getMessage());
+           }
+           return bookingList;
+       }
 }
