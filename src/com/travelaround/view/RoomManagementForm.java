@@ -30,14 +30,14 @@ public class RoomManagementForm extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         txtResortID = new javax.swing.JTextField();
         btnAddRoom = new javax.swing.JButton();
-        txtRoomNo = new javax.swing.JPasswordField();
         jLabel4 = new javax.swing.JLabel();
-        txtRoomPrice = new javax.swing.JPasswordField();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblRooms = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
         cmbRoomType = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
+        txtRoomNo = new javax.swing.JTextField();
+        txtRoomPrice = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -182,8 +182,8 @@ public class RoomManagementForm extends javax.swing.JFrame {
 
     private void btnAddRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddRoomActionPerformed
         String hotelIdStr = txtResortID.getText().trim(); // Fixed variable casing
-        String roomNo = new String(txtRoomNo.getPassword()).trim(); // JPasswordField requires getPassword()
-        String priceStr = new String(txtRoomPrice.getPassword()).trim();
+        String roomNo = new String(txtRoomNo.getText()).trim(); // JPasswordField requires getPassword()
+        String priceStr = new String(txtRoomPrice.getText()).trim();
         String selectedType = cmbRoomType.getSelectedItem().toString();
 
         if (hotelIdStr.isEmpty() || roomNo.isEmpty() || priceStr.isEmpty()) {
@@ -219,7 +219,7 @@ public class RoomManagementForm extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tblRooms;
     private javax.swing.JTextField txtResortID;
-    private javax.swing.JPasswordField txtRoomNo;
-    private javax.swing.JPasswordField txtRoomPrice;
+    private javax.swing.JTextField txtRoomNo;
+    private javax.swing.JTextField txtRoomPrice;
     // End of variables declaration//GEN-END:variables
 }

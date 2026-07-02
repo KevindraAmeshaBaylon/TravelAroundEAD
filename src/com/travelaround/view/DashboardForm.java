@@ -18,6 +18,10 @@ public class DashboardForm extends javax.swing.JFrame {
         // Fetch live system summary cards analytics from database 
         loadDatabaseAnalytics();
     }
+    // Add this so the form can be opened with no arguments safely
+    public DashboardForm() {
+        initComponents();
+    }
     private void loadDatabaseAnalytics() {
     lblTotalUsers.setText(String.valueOf(controller.getSystemCount("Users")));
     lblTotalHotels.setText(String.valueOf(controller.getSystemCount("Hotels")));
