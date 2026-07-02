@@ -72,4 +72,24 @@ public class UserController {
         }
         return 0.0;
     }
+    
+    /**
+     * Registers a new customer into the database.
+     * Sets the default role to 'Customer'.
+     */
+    public boolean registerCustomer(String username, String password, String email, String phone) {
+        String query = "INSERT INTO Users (username, password, email, phone, role) VALUES (?, ?, ?, ?, 'Customer')";
+
+        try (PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ps.setString(3, email);
+            ps.setString(4, phone);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Registration System Error: " + e.getMessage());
+            return false;
+        }
+    }
 }
