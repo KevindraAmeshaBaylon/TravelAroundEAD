@@ -8,32 +8,51 @@ public class DashboardForm extends javax.swing.JFrame {
     private com.travelaround.controller.UserController controller;
     public DashboardForm(com.travelaround.model.User user) {
         initComponents();
-
         this.currentUser = user;
         this.controller = new com.travelaround.controller.UserController();
 
         // Set dynamic welcoming title matching user role clearance
-        lblUserWelcome.setText("Welcome back, " + currentUser.getUsername() + " | Account Access: [" + currentUser.getRole() + "]");
+        if (currentUser != null) {
+            lblUserWelcome.setText("Welcome back, " + currentUser.getUsername() + " | Account Access: [" + currentUser.getRole() + "]");
+            enforceRoleAccessControls();
+        }
 
-        // Fetch live system summary cards analytics from database 
+        this.setLocationRelativeTo(null);
         loadDatabaseAnalytics();
     }
     // Add this so the form can be opened with no arguments safely
     public DashboardForm() {
         initComponents();
         this.controller = new com.travelaround.controller.UserController();
+        this.setLocationRelativeTo(null);
         loadDatabaseAnalytics();
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     }
     
-   private void loadDatabaseAnalytics() {
-        if (controller != null) {
-            lblTotalUsers.setText(String.valueOf(controller.getSystemCount("Users")));
-            lblTotalHotels.setText(String.valueOf(controller.getSystemCount("Hotels")));
-            lblTotalRooms.setText(String.valueOf(controller.getSystemCount("Rooms")));
-            lblTotalRevenue.setText("$" + String.format("%.2f", controller.getTotalRevenue()));
-        }
+    /**
+     * Restricts UI button elements depending on user permission hierarchy
+     */
+    private void enforceRoleAccessControls() {
+        boolean isAdmin = currentUser.getRole().equalsIgnoreCase("Admin");
+        
+        // Non-admins shouldn't modify hotel structures or room logs
+        btnBookRoom1.setVisible(isAdmin);    // Manage Rooms Button
+        btnManageHotels.setVisible(isAdmin); // Manage Hotels Button
+        btnViewLogs.setVisible(isAdmin);     // View Logs Button
     }
-   
+    
+    private void loadDatabaseAnalytics() {
+            if (controller != null) {
+                try {
+                    lblTotalUsers.setText(String.valueOf(controller.getSystemCount("Users")));
+                    lblTotalHotels.setText(String.valueOf(controller.getSystemCount("Hotels")));
+                    lblTotalRooms.setText(String.valueOf(controller.getSystemCount("Rooms")));
+                    lblTotalRevenue.setText("$" + String.format("%.2f", controller.getTotalRevenue()));
+                } catch (Exception e) {
+                    logger.log(java.util.logging.Level.SEVERE, "Analytics tracking engine load failure", e);
+                }
+            }
+     }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -313,27 +332,27 @@ public class DashboardForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
-        this.dispose(); // Terminate dashboard view
+        // 1. Close and destroy the current dashboard window completely
+        this.dispose(); 
+
+        // 2. Open up ONE fresh copy of the login screen
         com.travelaround.view.LoginForm loginWindow = new com.travelaround.view.LoginForm();
         loginWindow.setLocationRelativeTo(null);
-        loginWindow.setVisible(true); // Return back to core security clearance gate
+        loginWindow.setVisible(true);
     }//GEN-LAST:event_btnLogoutActionPerformed
 
     private void btnBookRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBookRoomActionPerformed
         BookingForm bookingScreen = new BookingForm();
-        bookingScreen.setLocationRelativeTo(null);
         bookingScreen.setVisible(true);
     }//GEN-LAST:event_btnBookRoomActionPerformed
 
     private void btnBookRoom1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBookRoom1ActionPerformed
         RoomManagementForm roomScreen = new RoomManagementForm();
-        roomScreen.setLocationRelativeTo(null);
         roomScreen.setVisible(true);
     }//GEN-LAST:event_btnBookRoom1ActionPerformed
 
     private void btnViewLogsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewLogsActionPerformed
         BookingHistoryForm historyScreen = new BookingHistoryForm();
-        historyScreen.setLocationRelativeTo(null);
         historyScreen.setVisible(true);
     }//GEN-LAST:event_btnViewLogsActionPerformed
 
@@ -342,17 +361,8 @@ public class DashboardForm extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowGainedFocus
 
     private void btnManageHotelsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnManageHotelsActionPerformed
-        // Instantiate the hidden view window
         com.travelaround.view.HotelManagementForm hotelForm = new com.travelaround.view.HotelManagementForm();
-
-        // Display the hotel administration interface window layout on screen
         hotelForm.setVisible(true);
-
-        // Center the newly popped frame symmetrically on the screen workspace
-        hotelForm.setLocationRelativeTo(null);
-
-        // Optionally close or minimize the current dashboard panel to clear space
-        //this.dispose();
     }//GEN-LAST:event_btnManageHotelsActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
