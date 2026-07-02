@@ -14,12 +14,12 @@ public class RoomController {
     }
 
     // CREATE: Insert a brand new room structure
-    public boolean addRoom(int hotelId, String roomNum, String type, double price) {
+    public boolean addRoom(int hotelId, String roomType, double price, int roomNo) {
         String query = "INSERT INTO Rooms (hotel_id, room_number, room_type, price_per_night, status) VALUES (?, ?, ?, ?, 'Available')";
         try (PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, hotelId);
-            ps.setString(2, roomNum);
-            ps.setString(3, type);
+            ps.setInt(2, roomNo);
+            ps.setString(3, roomType);
             ps.setDouble(4, price);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {

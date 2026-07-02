@@ -192,28 +192,37 @@ public class RoomManagementForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnClearActionPerformed
 
     private void btnAddRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddRoomActionPerformed
-        String hotelIdStr = txtResortID.getText().trim(); // Fixed variable casing
-        String roomNo = new String(txtRoomNo.getText()).trim(); // JPasswordField requires getPassword()
-        String priceStr = new String(txtRoomPrice.getText()).trim();
+       String hotelIdStr = txtResortID.getText().trim(); 
+        String roomNoStr = txtRoomNo.getText().trim();
+        String priceStr = txtRoomPrice.getText().trim();
         String selectedType = cmbRoomType.getSelectedItem().toString();
 
-        if (hotelIdStr.isEmpty() || roomNo.isEmpty() || priceStr.isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(null, "Please supply all setup properties.");
+        if (hotelIdStr.isEmpty() || roomNoStr.isEmpty() || priceStr.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Please supply all setup properties before adding a room.", "Missing Data", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         try {
             int hotelId = Integer.parseInt(hotelIdStr);
+            int roomNo = Integer.parseInt(roomNoStr); 
             double price = Double.parseDouble(priceStr);
 
-            if (roomController.addRoom(hotelId, roomNo, selectedType, price)) {
-                javax.swing.JOptionPane.showMessageDialog(null, "Room added successfully!");
+            if (price <= 0) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Room price must be a valid positive numerical amount.", "Invalid Price Metric", javax.swing.JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // FIXED PARAMETER ORDER HERE: Passed selectedType (String) before roomNo (int)
+            if (roomController.addRoom(hotelId, selectedType, price, roomNo)) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Room added successfully!");
                 refreshRoomTable();
+
                 txtRoomNo.setText("");
                 txtRoomPrice.setText("");
             }
+
         } catch (NumberFormatException e) {
-            javax.swing.JOptionPane.showMessageDialog(null, "Parsing inputs mismatch errors. Ensure Hotel ID and Price are numeric.");
+            javax.swing.JOptionPane.showMessageDialog(this, "Hotel ID, Room Number, and Price must contain numbers only.", "Parsing Inputs Mismatch Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnAddRoomActionPerformed
 
@@ -221,6 +230,12 @@ public class RoomManagementForm extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_btnBackActionPerformed
 
+    public static void main(String[] args) {
+    java.awt.EventQueue.invokeLater(() -> {
+        new RoomManagementForm().setVisible(true);
+    });
+}
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddRoom;
     private javax.swing.JButton btnBack;

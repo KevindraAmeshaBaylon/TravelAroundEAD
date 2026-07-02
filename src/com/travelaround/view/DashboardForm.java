@@ -21,14 +21,19 @@ public class DashboardForm extends javax.swing.JFrame {
     // Add this so the form can be opened with no arguments safely
     public DashboardForm() {
         initComponents();
+        this.controller = new com.travelaround.controller.UserController();
+        loadDatabaseAnalytics();
     }
-    private void loadDatabaseAnalytics() {
-    lblTotalUsers.setText(String.valueOf(controller.getSystemCount("Users")));
-    lblTotalHotels.setText(String.valueOf(controller.getSystemCount("Hotels")));
-    lblTotalRooms.setText(String.valueOf(controller.getSystemCount("Rooms")));
-    lblTotalRevenue.setText("$" + String.format("%.2f", controller.getTotalRevenue()));
-}
-
+    
+   private void loadDatabaseAnalytics() {
+        if (controller != null) {
+            lblTotalUsers.setText(String.valueOf(controller.getSystemCount("Users")));
+            lblTotalHotels.setText(String.valueOf(controller.getSystemCount("Hotels")));
+            lblTotalRooms.setText(String.valueOf(controller.getSystemCount("Rooms")));
+            lblTotalRevenue.setText("$" + String.format("%.2f", controller.getTotalRevenue()));
+        }
+    }
+   
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -59,6 +64,13 @@ public class DashboardForm extends javax.swing.JFrame {
         btnViewLogs = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowFocusListener(new java.awt.event.WindowFocusListener() {
+            public void windowGainedFocus(java.awt.event.WindowEvent evt) {
+                formWindowGainedFocus(evt);
+            }
+            public void windowLostFocus(java.awt.event.WindowEvent evt) {
+            }
+        });
 
         lblUserWelcome.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblUserWelcome.setText("Logged in as: [Role Name Account]");
@@ -315,6 +327,10 @@ public class DashboardForm extends javax.swing.JFrame {
         historyScreen.setLocationRelativeTo(null);
         historyScreen.setVisible(true);
     }//GEN-LAST:event_btnViewLogsActionPerformed
+
+    private void formWindowGainedFocus(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowGainedFocus
+        loadDatabaseAnalytics();
+    }//GEN-LAST:event_formWindowGainedFocus
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBookRoom;
