@@ -62,6 +62,7 @@ public class DashboardForm extends javax.swing.JFrame {
         btnLogout = new javax.swing.JButton();
         btnBookRoom1 = new javax.swing.JButton();
         btnViewLogs = new javax.swing.JButton();
+        btnManageHotels = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowFocusListener(new java.awt.event.WindowFocusListener() {
@@ -255,6 +256,11 @@ public class DashboardForm extends javax.swing.JFrame {
         btnViewLogs.setActionCommand("Book a Room");
         btnViewLogs.addActionListener(this::btnViewLogsActionPerformed);
 
+        btnManageHotels.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnManageHotels.setText("Manage Hotels");
+        btnManageHotels.setActionCommand("Book a Room");
+        btnManageHotels.addActionListener(this::btnManageHotelsActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -269,7 +275,9 @@ public class DashboardForm extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btnBookRoom1)
                                 .addGap(18, 18, 18)
-                                .addComponent(btnViewLogs))
+                                .addComponent(btnViewLogs)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnManageHotels))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -296,7 +304,8 @@ public class DashboardForm extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnBookRoom1)
-                    .addComponent(btnViewLogs))
+                    .addComponent(btnViewLogs)
+                    .addComponent(btnManageHotels))
                 .addContainerGap(17, Short.MAX_VALUE))
         );
 
@@ -332,10 +341,25 @@ public class DashboardForm extends javax.swing.JFrame {
         loadDatabaseAnalytics();
     }//GEN-LAST:event_formWindowGainedFocus
 
+    private void btnManageHotelsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnManageHotelsActionPerformed
+        // Instantiate the hidden view window
+        com.travelaround.view.HotelManagementForm hotelForm = new com.travelaround.view.HotelManagementForm();
+
+        // Display the hotel administration interface window layout on screen
+        hotelForm.setVisible(true);
+
+        // Center the newly popped frame symmetrically on the screen workspace
+        hotelForm.setLocationRelativeTo(null);
+
+        // Optionally close or minimize the current dashboard panel to clear space
+        //this.dispose();
+    }//GEN-LAST:event_btnManageHotelsActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBookRoom;
     private javax.swing.JButton btnBookRoom1;
     private javax.swing.JButton btnLogout;
+    private javax.swing.JButton btnManageHotels;
     private javax.swing.JButton btnViewLogs;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

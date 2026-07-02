@@ -1,44 +1,38 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package com.travelaround.view;
 
-/**
- *
- * @author kevin
- */
 public class BookingHistoryForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(BookingHistoryForm.class.getName());
+    private com.travelaround.controller.BookingController bookingController;
 
     /**
      * Creates new form BookingHistoryForm
      */
     public BookingHistoryForm() {
         initComponents();
+        bookingController = new com.travelaround.controller.BookingController();
+        this.setLocationRelativeTo(null); // Center form smoothly on screen
         populateLogTable();
     }
 
     private void populateLogTable() {
-    javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblHistory.getModel();
-    model.setRowCount(0); // Wipe clean
-    
-    com.travelaround.controller.BookingController controller = new com.travelaround.controller.BookingController();
-    java.util.List<com.travelaround.model.Booking> masterList = controller.getAllBookings();
-    
-    for (com.travelaround.model.Booking bk : masterList) {
-        Object[] rowData = {
-            bk.getBookingId(),
-            bk.getCustomerId(),
-            bk.getRoomId(),
-            bk.getCheckInDate(),
-            bk.getCheckOutDate(),
-            bk.getBookingStatus()
-        };
-        model.addRow(rowData);
+        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblHistory.getModel();
+        model.setRowCount(0); // Wipe clean
+        
+        java.util.List<com.travelaround.model.Booking> masterList = bookingController.getAllBookings();
+        
+        for (com.travelaround.model.Booking bk : masterList) {
+            Object[] rowData = {
+                bk.getBookingId(),
+                bk.getCustomerId(),
+                bk.getRoomId(),
+                bk.getCheckInDate(),
+                bk.getCheckOutDate(),
+                bk.getBookingStatus()
+            };
+            model.addRow(rowData);
+        }
     }
-}
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -48,6 +42,7 @@ public class BookingHistoryForm extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblHistory = new javax.swing.JTable();
+        btnCancelBooking = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -69,9 +64,9 @@ public class BookingHistoryForm extends javax.swing.JFrame {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGap(32, 32, 32)
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 122, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnCloseWindow)
-                .addGap(25, 25, 25))
+                .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -104,6 +99,11 @@ public class BookingHistoryForm extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(tblHistory);
 
+        btnCancelBooking.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnCancelBooking.setText("Cancel Reservation");
+        btnCancelBooking.setActionCommand("");
+        btnCancelBooking.addActionListener(this::btnCancelBookingActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -111,16 +111,22 @@ public class BookingHistoryForm extends javax.swing.JFrame {
             .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnCancelBooking)
+                .addGap(24, 24, 24))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 397, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 34, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnCancelBooking)
+                .addGap(0, 17, Short.MAX_VALUE))
         );
 
         pack();
@@ -130,7 +136,38 @@ public class BookingHistoryForm extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_btnCloseWindowActionPerformed
 
+    private void btnCancelBookingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelBookingActionPerformed
+        int selectedRow = tblHistory.getSelectedRow();
+        if (selectedRow == -1) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Please select a reservation row from the table first.");
+            return;
+        }
+
+        int bookingId = (int) tblHistory.getValueAt(selectedRow, 0);
+        String currentStatus = tblHistory.getValueAt(selectedRow, 5).toString();
+
+        if (currentStatus.equalsIgnoreCase("Cancelled")) {
+            javax.swing.JOptionPane.showMessageDialog(this, "This reservation has already been cancelled.");
+            return;
+        }
+
+        int confirmation = javax.swing.JOptionPane.showConfirmDialog(this, 
+                "Are you sure you want to cancel booking ID " + bookingId + "?", 
+                "Confirm Cancellation", javax.swing.JOptionPane.YES_NO_OPTION);
+
+        if (confirmation == javax.swing.JOptionPane.YES_OPTION) {
+            if (bookingController.cancelBooking(bookingId)) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Reservation cancelled successfully. Room availability released.");
+                populateLogTable(); 
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "Failed to cancel transaction. Please verify database constraints.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+    }//GEN-LAST:event_btnCancelBookingActionPerformed
+    }
+    
+ 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCancelBooking;
     private javax.swing.JButton btnCloseWindow;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel5;

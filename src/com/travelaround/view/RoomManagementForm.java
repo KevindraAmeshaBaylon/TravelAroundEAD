@@ -230,11 +230,6 @@ public class RoomManagementForm extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_btnBackActionPerformed
 
-    public static void main(String[] args) {
-    java.awt.EventQueue.invokeLater(() -> {
-        new RoomManagementForm().setVisible(true);
-    });
-}
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddRoom;

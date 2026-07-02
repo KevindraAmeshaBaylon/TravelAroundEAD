@@ -70,6 +70,12 @@ public class BookingController {
         }
     }
     
+       public boolean cancelBooking(int bookingId) {
+    // TODO: Connect your DBConnection statement to update the booking status to 'Cancelled'
+    // Example: UPDATE booking SET status = 'Cancelled' WHERE booking_id = bookingId;
+    System.out.println("Booking ID " + bookingId + " has been requested for cancellation.");
+    return true; 
+}
         /**
         * Fetches all booking transaction records to display on the master log view.
         */

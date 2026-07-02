@@ -42,7 +42,7 @@ public class RegistrationForm extends javax.swing.JFrame {
         txtRegPassword = new javax.swing.JPasswordField();
         btnBackToLogin = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         lbluname.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lbluname.setText("Username");

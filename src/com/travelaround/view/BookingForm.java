@@ -1,22 +1,17 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package com.travelaround.view;
 
-/**
- *
- * @author kevin
- */
 public class BookingForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(BookingForm.class.getName());
-
+    private com.travelaround.controller.BookingController bookingController;
     /**
      * Creates new form BookingForm
      */
     public BookingForm() {
         initComponents();
+        bookingController = new com.travelaround.controller.BookingController();
+        this.setLocationRelativeTo(null); // Center form smoothly on launch
     }
 
     /**
@@ -42,7 +37,7 @@ public class BookingForm extends javax.swing.JFrame {
         btnClear = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         lblRoomId.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblRoomId.setText("Room ID :");
@@ -135,9 +130,7 @@ public class BookingForm extends javax.swing.JFrame {
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(btnBack)
                                 .addGap(165, 165, 165))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(btnConfirmBooking, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                            .addComponent(btnConfirmBooking, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(76, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -172,34 +165,45 @@ public class BookingForm extends javax.swing.JFrame {
 
     private void btnConfirmBookingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmBookingActionPerformed
     String roomIdStr = txtRoomId.getText().trim();
-    String costStr = txtTotalCost.getText().trim();
-    String checkIn = txtCheckIn.getText().trim();
-    String checkOut = txtCheckOut.getText().trim();
+        String costStr = txtTotalCost.getText().trim();
+        String checkIn = txtCheckIn.getText().trim();
+        String checkOut = txtCheckOut.getText().trim();
 
-    if (roomIdStr.isEmpty() || costStr.isEmpty() || checkIn.isEmpty() || checkOut.isEmpty()) {
-        javax.swing.JOptionPane.showMessageDialog(null, "Please supply all processing fields.");
-        return;
-    }
-
-    try {
-        int roomId = Integer.parseInt(roomIdStr);
-        double cost = Double.parseDouble(costStr);
-        
-        com.travelaround.controller.BookingController bookingController = new com.travelaround.controller.BookingController();
-        
-        // Try executing the database transaction operation
-        boolean success = bookingController.processRoomBooking(1, roomId, checkIn, checkOut, cost); // Uses default user ID 1 for testing
-        
-        if (success) {
-            javax.swing.JOptionPane.showMessageDialog(null, "Booking Transaction Confirmed! Invoice generated.");
+        if (roomIdStr.isEmpty() || costStr.isEmpty() || checkIn.isEmpty() || checkOut.isEmpty() 
+                || checkIn.equals("YYYY-MM-DD") || checkOut.equals("YYYY-MM-DD")) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Please supply all processing fields with valid data.");
+            return;
         }
-        
-    } catch (NumberFormatException e) {
-        javax.swing.JOptionPane.showMessageDialog(null, "Invalid numerical entry parsed.");
-    } catch (com.travelaround.exception.RoomUnavailableException e) {
-        // Catch and display your custom user-defined exception popup here
-        javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Reservation Conflict Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-    }
+
+        // Validate date layout structures before processing transactions
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
+            java.time.LocalDate.parse(checkIn, formatter);
+            java.time.LocalDate.parse(checkOut, formatter);
+        } catch (java.time.format.DateTimeParseException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Dates must match the exact layout requested (YYYY-MM-DD).", "Format Input Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            int roomId = Integer.parseInt(roomIdStr);
+            double cost = Double.parseDouble(costStr);
+            
+            // Execute structural database booking transactional workflow
+            boolean success = bookingController.processRoomBooking(1, roomId, checkIn, checkOut, cost); // Default User ID: 1
+            
+            if (success) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Booking Transaction Confirmed! Invoice generated successfully.");
+                btnClearActionPerformed(null); // Wipe fields clean on success
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "Processing failed. Please check that Room ID exists.", "Database Error", javax.swing.JOptionPane.WARNING_MESSAGE);
+            }
+            
+        } catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Invalid numerical entry parsed for Room ID or Total Price.", "Input Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        } catch (com.travelaround.exception.RoomUnavailableException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Reservation Conflict Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
 
     }//GEN-LAST:event_btnConfirmBookingActionPerformed
 
