@@ -136,6 +136,7 @@ public class BookingHistoryForm extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_btnCloseWindowActionPerformed
 
+    
     private void btnCancelBookingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelBookingActionPerformed
         int selectedRow = tblHistory.getSelectedRow();
         if (selectedRow == -1) {
@@ -155,6 +156,7 @@ public class BookingHistoryForm extends javax.swing.JFrame {
                 "Are you sure you want to cancel booking ID " + bookingId + "?", 
                 "Confirm Cancellation", javax.swing.JOptionPane.YES_NO_OPTION);
 
+        
         if (confirmation == javax.swing.JOptionPane.YES_OPTION) {
             if (bookingController.cancelBooking(bookingId)) {
                 javax.swing.JOptionPane.showMessageDialog(this, "Reservation cancelled successfully. Room availability released.");

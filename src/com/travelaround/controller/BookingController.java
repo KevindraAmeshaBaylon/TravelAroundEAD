@@ -16,89 +16,83 @@ public class BookingController {
      * Throws RoomUnavailableException if the selected room is already booked.
      */
     public boolean processRoomBooking(int customerId, int roomId, String checkIn, String checkOut, double cost) throws RoomUnavailableException {
-        // 1. Check current room status first
-        String statusCheckQuery = "SELECT status FROM Rooms WHERE room_id = ?";
-        try (PreparedStatement psCheck = conn.prepareStatement(statusCheckQuery)) {
-            psCheck.setInt(1, roomId);
-            try (ResultSet rs = psCheck.executeQuery()) {
-                if (rs.next() && "Booked".equalsIgnoreCase(rs.getString("status"))) {
-                    // Throw your custom exception if unavailable
-                    throw new RoomUnavailableException("Transaction Aborted: This room is already occupied during the requested period.");
+       String checkSql = "SELECT COUNT(*) FROM bookings WHERE room_id = ? AND booking_status != 'Cancelled' "
+                        + "AND ((check_in_date <= ? AND check_out_date >= ?) OR (check_in_date <= ? AND check_out_date >= ?))";
+        
+        String insertSql = "INSERT INTO bookings (customer_id, room_id, check_in_date, check_out_date, total_cost, booking_status) VALUES (?, ?, ?, ?, ?, 'Confirmed')";
+
+        try (Connection conn = DBConnection.getConnection()) {
+            // Check Availability
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+                checkStmt.setInt(1, roomId);
+                checkStmt.setString(2, checkOut);
+                checkStmt.setString(3, checkIn);
+                checkStmt.setString(4, checkIn);
+                checkStmt.setString(5, checkOut);
+                
+                try (ResultSet rs = checkStmt.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        throw new RoomUnavailableException("This room is already reserved for the selected dates.");
+                    }
                 }
             }
+
+            // Execute reservation insertion
+            try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+                insertStmt.setInt(1, customerId);
+                insertStmt.setInt(2, roomId);
+                insertStmt.setString(3, checkIn);
+                insertStmt.setString(4, checkOut);
+                insertStmt.setDouble(5, cost);
+                
+                return insertStmt.executeUpdate() > 0;
+            }
         } catch (SQLException e) {
-            System.out.println("Status tracking database error: " + e.getMessage());
-            return false;
-        }
-
-        // 2. Begin Transaction to execute multi-table writes safely
-        try {
-            conn.setAutoCommit(false);
-
-            // Statement A: Insert the Booking log record
-            String insertBookingQuery = "INSERT INTO Bookings (customer_id, room_id, check_in_date, check_out_date, total_cost, booking_status) VALUES (?, ?, ?, ?, ?, 'Confirmed')";
-            try (PreparedStatement psBook = conn.prepareStatement(insertBookingQuery)) {
-                psBook.setInt(1, customerId);
-                psBook.setInt(2, roomId);
-                psBook.setDate(3, java.sql.Date.valueOf(checkIn));
-                psBook.setDate(4, java.sql.Date.valueOf(checkOut));
-                psBook.setDouble(5, cost);
-                psBook.executeUpdate();
-            }
-
-            // Statement B: Automatically flip Room status condition block
-            String updateRoomQuery = "UPDATE Rooms SET status = 'Booked' WHERE room_id = ?";
-            try (PreparedStatement psRoom = conn.prepareStatement(updateRoomQuery)) {
-                psRoom.setInt(1, roomId);
-                psRoom.executeUpdate();
-            }
-
-            // Commit transaction modifications safely
-            conn.commit();
-            conn.setAutoCommit(true);
-            return true;
-
-        } catch (SQLException e) {
-            try {
-                conn.rollback(); // Rollback if any write crashes to maintain data integrity
-                conn.setAutoCommit(true);
-            } catch (SQLException rollbackEx) {
-                System.out.println("Rollback execution error: " + rollbackEx.getMessage());
-            }
-            System.out.println("Booking Transaction processing failed: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }
-    
-       public boolean cancelBooking(int bookingId) {
-    // TODO: Connect your DBConnection statement to update the booking status to 'Cancelled'
-    // Example: UPDATE booking SET status = 'Cancelled' WHERE booking_id = bookingId;
-    System.out.println("Booking ID " + bookingId + " has been requested for cancellation.");
-    return true; 
-}
-        /**
-        * Fetches all booking transaction records to display on the master log view.
-        */
-       public java.util.List<com.travelaround.model.Booking> getAllBookings() {
-           java.util.List<com.travelaround.model.Booking> bookingList = new java.util.ArrayList<>();
-           String query = "SELECT * FROM Bookings";
+    /**
+     * Cancels an existing booking transaction by its ID tracking column.
+     */
+    public boolean cancelBooking(int bookingId) {
+        String sql = "UPDATE bookings SET booking_status = 'Cancelled' WHERE booking_id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, bookingId);
+            return stmt.executeUpdate() > 0;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    /**
+     * Fetches records matching database columns.
+     */
+    public java.util.List<com.travelaround.model.Booking> getAllBookings() {
+        java.util.List<com.travelaround.model.Booking> bookingList = new java.util.ArrayList<>();
+        String query = "SELECT * FROM bookings";
 
-           try (Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(query)) {
-               while (rs.next()) {
-                   bookingList.add(new com.travelaround.model.Booking(
-                       rs.getInt("booking_id"),
-                       rs.getInt("customer_id"),
-                       rs.getInt("room_id"),
-                       rs.getDate("check_in_date"),
-                       rs.getDate("check_out_date"),
-                       rs.getDouble("total_cost"),
-                       rs.getString("booking_status")
-                   ));
-               }
-           } catch (SQLException e) {
-               System.out.println("Error pulling transaction files: " + e.getMessage());
-           }
-           return bookingList;
-       }
-}
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+             
+            while (rs.next()) {
+                bookingList.add(new com.travelaround.model.Booking(
+                    rs.getInt("booking_id"),
+                    rs.getInt("customer_id"), 
+                    rs.getInt("room_id"),
+                    rs.getDate("check_in_date"),
+                    rs.getDate("check_out_date"),
+                    rs.getDouble("total_cost"),
+                    rs.getString("booking_status")
+                ));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error pulling transaction files: " + e.getMessage());
+        }
+        return bookingList;
+}}

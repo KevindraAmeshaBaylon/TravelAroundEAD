@@ -5,15 +5,24 @@ public class BookingForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(BookingForm.class.getName());
     private com.travelaround.controller.BookingController bookingController;
+    private com.travelaround.model.User currentUser;
+
     /**
-     * Creates new form BookingForm
+     * Creates new form BookingForm tracked to active session
      */
-    public BookingForm() {
+    public BookingForm(com.travelaround.model.User user) {
         initComponents();
-        bookingController = new com.travelaround.controller.BookingController();
+        this.currentUser = user;
+        this.bookingController = new com.travelaround.controller.BookingController();
         this.setLocationRelativeTo(null); // Center form smoothly on launch
     }
 
+    // Safe default fallback constructor
+    public BookingForm() {
+        initComponents();
+        this.bookingController = new com.travelaround.controller.BookingController();
+        this.setLocationRelativeTo(null);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -164,13 +173,13 @@ public class BookingForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnConfirmBookingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmBookingActionPerformed
-    String roomIdStr = txtRoomId.getText().trim();
+        String roomIdStr = txtRoomId.getText().trim();
         String costStr = txtTotalCost.getText().trim();
         String checkIn = txtCheckIn.getText().trim();
         String checkOut = txtCheckOut.getText().trim();
 
         if (roomIdStr.isEmpty() || costStr.isEmpty() || checkIn.isEmpty() || checkOut.isEmpty() 
-                || checkIn.equals("YYYY-MM-DD") || checkOut.equals("YYYY-MM-DD")) {
+                || checkIn.equalsIgnoreCase("YYYY-MM-DD") || checkOut.equalsIgnoreCase("YYYY-MM-DD")) {
             javax.swing.JOptionPane.showMessageDialog(this, "Please supply all processing fields with valid data.");
             return;
         }
@@ -189,14 +198,17 @@ public class BookingForm extends javax.swing.JFrame {
             int roomId = Integer.parseInt(roomIdStr);
             double cost = Double.parseDouble(costStr);
             
+            // Derive active customer context dynamically or fall back to 1 safely
+            int userId = (currentUser != null) ? currentUser.getUserId() : 1;
+            
             // Execute structural database booking transactional workflow
-            boolean success = bookingController.processRoomBooking(1, roomId, checkIn, checkOut, cost); // Default User ID: 1
+            boolean success = bookingController.processRoomBooking(userId, roomId, checkIn, checkOut, cost);
             
             if (success) {
                 javax.swing.JOptionPane.showMessageDialog(this, "Booking Transaction Confirmed! Invoice generated successfully.");
                 btnClearActionPerformed(null); // Wipe fields clean on success
             } else {
-                javax.swing.JOptionPane.showMessageDialog(this, "Processing failed. Please check that Room ID exists.", "Database Error", javax.swing.JOptionPane.WARNING_MESSAGE);
+                javax.swing.JOptionPane.showMessageDialog(this, "Processing failed. Please check that Room ID exists and is available.", "Database Error", javax.swing.JOptionPane.WARNING_MESSAGE);
             }
             
         } catch (NumberFormatException e) {
@@ -204,7 +216,6 @@ public class BookingForm extends javax.swing.JFrame {
         } catch (com.travelaround.exception.RoomUnavailableException e) {
             javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Reservation Conflict Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
-
     }//GEN-LAST:event_btnConfirmBookingActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
