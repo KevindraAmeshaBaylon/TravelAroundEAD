@@ -13,7 +13,6 @@ public class BookingController {
 
     /**
      * Executes an enterprise-level multi-table transactional reservation.
-     * Throws RoomUnavailableException if the selected room is already booked.
      */
     public boolean processRoomBooking(int customerId, int roomId, String checkIn, String checkOut, double cost) throws RoomUnavailableException {
        String checkSql = "SELECT COUNT(*) FROM bookings WHERE room_id = ? AND booking_status != 'Cancelled' "
@@ -21,9 +20,12 @@ public class BookingController {
         
         String insertSql = "INSERT INTO bookings (customer_id, room_id, check_in_date, check_out_date, total_cost, booking_status) VALUES (?, ?, ?, ?, ?, 'Confirmed')";
 
-        try (Connection conn = DBConnection.getConnection()) {
+        // Fixed: Ensure the shared connection is not placed in try-with-resources (avoids closing it)
+        try {
+            Connection liveConn = DBConnection.getConnection();
+            
             // Check Availability
-            try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+            try (PreparedStatement checkStmt = liveConn.prepareStatement(checkSql)) {
                 checkStmt.setInt(1, roomId);
                 checkStmt.setString(2, checkOut);
                 checkStmt.setString(3, checkIn);
@@ -38,7 +40,7 @@ public class BookingController {
             }
 
             // Execute reservation insertion
-            try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+            try (PreparedStatement insertStmt = liveConn.prepareStatement(insertSql)) {
                 insertStmt.setInt(1, customerId);
                 insertStmt.setInt(2, roomId);
                 insertStmt.setString(3, checkIn);
@@ -58,13 +60,18 @@ public class BookingController {
     public boolean cancelBooking(int bookingId) {
         String sql = "UPDATE bookings SET booking_status = 'Cancelled' WHERE booking_id = ?";
         
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try {
+            Connection liveConn = DBConnection.getConnection();
+            PreparedStatement stmt = liveConn.prepareStatement(sql);
             
             stmt.setInt(1, bookingId);
-            return stmt.executeUpdate() > 0;
+            int rowsUpdated = stmt.executeUpdate();
+            
+            stmt.close(); // Close only the statement, keep connection open
+            return rowsUpdated > 0;
             
         } catch (SQLException e) {
+            System.out.println("Database execution error during cancellation step:");
             e.printStackTrace();
             return false;
         }
@@ -76,9 +83,11 @@ public class BookingController {
         java.util.List<com.travelaround.model.Booking> bookingList = new java.util.ArrayList<>();
         String query = "SELECT * FROM bookings";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
+        // Fixed: Removed Connection from try-with-resources statement so it stays alive
+        try {
+            Connection liveConn = DBConnection.getConnection();
+            PreparedStatement stmt = liveConn.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
              
             while (rs.next()) {
                 bookingList.add(new com.travelaround.model.Booking(
@@ -91,8 +100,14 @@ public class BookingController {
                     rs.getString("booking_status")
                 ));
             }
+            
+            // Close statement and result set manually, keeping connection alive
+            rs.close();
+            stmt.close();
+            
         } catch (SQLException e) {
             System.out.println("Error pulling transaction files: " + e.getMessage());
         }
         return bookingList;
+   
 }}

@@ -9,6 +9,7 @@ public class HotelManagementForm extends javax.swing.JFrame {
         initComponents();
         hotelController = new com.travelaround.controller.HotelController();
         refreshTable(); // Load database data into the table immediately on startup
+        this.setLocationRelativeTo(null);
 }
     private void refreshTable() {
     // Get the table structural data model

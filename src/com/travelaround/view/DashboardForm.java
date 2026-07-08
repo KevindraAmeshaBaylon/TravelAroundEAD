@@ -39,6 +39,7 @@ public class DashboardForm extends javax.swing.JFrame {
         btnBookRoom1.setVisible(isAdmin);    // Manage Rooms Button
         btnManageHotels.setVisible(isAdmin); // Manage Hotels Button
         btnViewLogs.setVisible(isAdmin);     // View Logs Button
+        btnViewReport.setVisible(isAdmin);  //View Report Button
     }
     
     private void loadDatabaseAnalytics() {
@@ -82,6 +83,7 @@ public class DashboardForm extends javax.swing.JFrame {
         btnBookRoom1 = new javax.swing.JButton();
         btnViewLogs = new javax.swing.JButton();
         btnManageHotels = new javax.swing.JButton();
+        btnViewReport = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowFocusListener(new java.awt.event.WindowFocusListener() {
@@ -280,6 +282,11 @@ public class DashboardForm extends javax.swing.JFrame {
         btnManageHotels.setActionCommand("Book a Room");
         btnManageHotels.addActionListener(this::btnManageHotelsActionPerformed);
 
+        btnViewReport.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnViewReport.setText("Launch Report");
+        btnViewReport.setActionCommand("Book a Room");
+        btnViewReport.addActionListener(this::btnViewReportActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -290,13 +297,15 @@ public class DashboardForm extends javax.swing.JFrame {
                     .addComponent(lblUserWelcome)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(14, 14, 14)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btnBookRoom1)
                                 .addGap(18, 18, 18)
                                 .addComponent(btnViewLogs)
                                 .addGap(18, 18, 18)
-                                .addComponent(btnManageHotels))
+                                .addComponent(btnManageHotels)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnViewReport))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -324,7 +333,8 @@ public class DashboardForm extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnBookRoom1)
                     .addComponent(btnViewLogs)
-                    .addComponent(btnManageHotels))
+                    .addComponent(btnManageHotels)
+                    .addComponent(btnViewReport))
                 .addContainerGap(17, Short.MAX_VALUE))
         );
 
@@ -365,12 +375,38 @@ public class DashboardForm extends javax.swing.JFrame {
         hotelForm.setVisible(true);
     }//GEN-LAST:event_btnManageHotelsActionPerformed
 
+    private void btnViewReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewReportActionPerformed
+      try {
+        // Path to your compiled Jasper design binary file
+        String reportPath = "C:\\Users\\kevin\\Documents\\NetBeansProjects\\TravelAround\\src\\com\\travelaround\\model\\report\\BookingSummaryReport.jasper"; 
+        
+        java.sql.Connection conn = com.travelaround.config.DBConnection.getConnection();
+        
+        // Fill the compiled report layout blueprint with your live database records
+        net.sf.jasperreports.engine.JasperPrint jasperPrint = 
+            net.sf.jasperreports.engine.JasperFillManager.fillReport(reportPath, null, conn);
+        
+        // Launch a clean Swing window to view, print, or export your report
+        net.sf.jasperreports.view.JasperViewer viewer = new net.sf.jasperreports.view.JasperViewer(jasperPrint, false);
+        viewer.setTitle("TravelAround - Operational Booking Management Report");
+        viewer.setVisible(true);
+        
+    } catch (Exception e) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Error rendering reporting engine views: " + e.getMessage(), 
+            "Reporting System Failure", 
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
+    }//GEN-LAST:event_btnViewReportActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBookRoom;
     private javax.swing.JButton btnBookRoom1;
     private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnManageHotels;
     private javax.swing.JButton btnViewLogs;
+    private javax.swing.JButton btnViewReport;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

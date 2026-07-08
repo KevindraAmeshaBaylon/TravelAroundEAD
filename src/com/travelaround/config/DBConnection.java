@@ -12,15 +12,16 @@ public class DBConnection {
     private static Connection connection = null;
 
     public static Connection getConnection() {
-        if (connection == null) {
-            try {
+        try {
+            // FIXED: If connection is null OR if it was previously closed, create a fresh one!
+            if (connection == null || connection.isClosed()) {
                 // Load the modern MySQL Driver
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 connection = DriverManager.getConnection(URL, USER, PASSWORD);
                 System.out.println(">>> Database Connected Successfully! <<<");
-            } catch (ClassNotFoundException | SQLException e) {
-                System.out.println(">>> Database Connection Failed: " + e.getMessage());
             }
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println(">>> Database Connection Failed: " + e.getMessage());
         }
         return connection;
     }

@@ -138,34 +138,24 @@ public class BookingHistoryForm extends javax.swing.JFrame {
 
     
     private void btnCancelBookingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelBookingActionPerformed
-        int selectedRow = tblHistory.getSelectedRow();
-        if (selectedRow == -1) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Please select a reservation row from the table first.");
-            return;
-        }
-
-        int bookingId = (int) tblHistory.getValueAt(selectedRow, 0);
-        String currentStatus = tblHistory.getValueAt(selectedRow, 5).toString();
-
-        if (currentStatus.equalsIgnoreCase("Cancelled")) {
-            javax.swing.JOptionPane.showMessageDialog(this, "This reservation has already been cancelled.");
-            return;
-        }
-
-        int confirmation = javax.swing.JOptionPane.showConfirmDialog(this, 
-                "Are you sure you want to cancel booking ID " + bookingId + "?", 
-                "Confirm Cancellation", javax.swing.JOptionPane.YES_NO_OPTION);
-
-        
-        if (confirmation == javax.swing.JOptionPane.YES_OPTION) {
-            if (bookingController.cancelBooking(bookingId)) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Reservation cancelled successfully. Room availability released.");
-                populateLogTable(); 
-            } else {
-                javax.swing.JOptionPane.showMessageDialog(this, "Failed to cancel transaction. Please verify database constraints.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-            }
-    }//GEN-LAST:event_btnCancelBookingActionPerformed
+    int selectedRow = tblHistory.getSelectedRow();
+    if (selectedRow == -1) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Please select a booking from the table to cancel.");
+        return;
     }
+    
+    // Get the booking ID value from the first column (index 0) of the selected row
+    int bookingId = Integer.parseInt(tblHistory.getValueAt(selectedRow, 0).toString());
+    
+    com.travelaround.controller.BookingController controller = new com.travelaround.controller.BookingController();
+    if (controller.cancelBooking(bookingId)) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Booking successfully cancelled!");
+        populateLogTable(); // Refresh your JTable layout grid data instantly
+    } else {
+        javax.swing.JOptionPane.showMessageDialog(this, "Failed to cancel transaction. Please verify database constraints.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
+    }//GEN-LAST:event_btnCancelBookingActionPerformed
+    
     
  
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -8,6 +8,7 @@ public class RoomManagementForm extends javax.swing.JFrame {
         initComponents();
         roomController = new com.travelaround.controller.RoomController();
         refreshRoomTable();
+        this.setLocationRelativeTo(null);
     }
 
     private void refreshRoomTable() {
