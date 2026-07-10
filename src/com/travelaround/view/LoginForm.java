@@ -166,24 +166,31 @@ public class LoginForm extends javax.swing.JFrame {
     // Pass data down to our MVC Controller layer
     com.travelaround.controller.UserController controller = new com.travelaround.controller.UserController();
     com.travelaround.model.User authenticatedUser = controller.loginUser(username, password);
-
     if (authenticatedUser != null) {
-        javax.swing.JOptionPane.showMessageDialog(this, 
-                "Welcome back, " + authenticatedUser.getUsername() + "!\nRole: " + authenticatedUser.getRole(), 
-                "Login Successful", 
-                javax.swing.JOptionPane.INFORMATION_MESSAGE);
-        
-        // TODO: Redirect user to their respective Role-Specific Dashboard next!
-        // Pass user data forward to initialize the active data board dashboard
-        com.travelaround.view.DashboardForm systemDashboard = new com.travelaround.view.DashboardForm(authenticatedUser);
-        systemDashboard.setLocationRelativeTo(null);
-        systemDashboard.setVisible(true);
-    } else {
-        javax.swing.JOptionPane.showMessageDialog(this, 
-                "Invalid username or password. Please try again.", 
-                "Authentication Failed", 
-                javax.swing.JOptionPane.ERROR_MESSAGE);
-    }
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Welcome back, " + authenticatedUser.getUsername() + "!\nRole: " + authenticatedUser.getRole(), 
+                    "Login Successful", 
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+            // Pull properties out from the returned model structure securely
+            int id = authenticatedUser.getId();
+            String name = authenticatedUser.getCustomerName(); 
+            String email = authenticatedUser.getEmail();
+            String phone = authenticatedUser.getPhone();
+            String role = authenticatedUser.getRole();
+
+            // Launch the centered dashboard with the session parameters
+            com.travelaround.view.DashboardForm systemDashboard = new com.travelaround.view.DashboardForm(id, name, email, phone, role);
+            systemDashboard.setVisible(true);
+
+            this.dispose();
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Invalid username or password. Please try again.", 
+                    "Authentication Failed", 
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+    // Ends the btnLoginActionPerformed method cleanly
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void lblRegisterLinkMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblRegisterLinkMouseClicked

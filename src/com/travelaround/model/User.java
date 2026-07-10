@@ -1,39 +1,77 @@
 package com.travelaround.model;
 
 public class User {
-    private int userId;
+    // 1. Existing fields (keep whatever you already had here, like username/password/role)
     private String username;
     private String password;
+    private String role;
+    
+    // 2. ADD THESE NEW FIELDS to hold the customer table details!
+    private int id;
+    private String customerName;
     private String email;
     private String phone;
-    private String role;
 
-    // Constructor to quickly build a user object
-    public User(int userId, String username, String password, String email, String phone, String role) {
-        this.userId = userId;
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.phone = phone;
-        this.role = role;
+    // Default Constructor
+    public User() {
     }
 
-    // Getters and Setters (Encapsulation Principles)
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
+    // --- ADD THESE SETTERS AND GETTERS FOR THE NEW FIELDS ---
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public int getId() {
+        return id;
+    }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getCustomerName() {
+        return customerName;
+    }
 
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
 
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    // --- Keep your existing getters/setters below for username, password, role ---
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+    
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

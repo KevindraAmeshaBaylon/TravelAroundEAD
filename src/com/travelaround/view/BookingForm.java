@@ -17,9 +17,11 @@ public class BookingForm extends javax.swing.JFrame {
         this.setLocationRelativeTo(null); // Center form smoothly on launch
     }
 
+    private int currentCustomerId;
     // Safe default fallback constructor
-    public BookingForm() {
+    public BookingForm(int customerId) {
         initComponents();
+        this.currentCustomerId = customerId;
         this.bookingController = new com.travelaround.controller.BookingController();
         this.setLocationRelativeTo(null);
     }
@@ -199,7 +201,8 @@ public class BookingForm extends javax.swing.JFrame {
             double cost = Double.parseDouble(costStr);
             
             // Derive active customer context dynamically or fall back to 1 safely
-            int userId = (currentUser != null) ? currentUser.getUserId() : 1;
+            int userId = (currentUser != null) ? currentUser.getId() : 1;
+            System.out.println("DEBUGGING: The Booking System is attempting to use Customer ID = " + userId);
             
             // Execute structural database booking transactional workflow
             boolean success = bookingController.processRoomBooking(userId, roomId, checkIn, checkOut, cost);

@@ -109,5 +109,86 @@ public class BookingController {
             System.out.println("Error pulling transaction files: " + e.getMessage());
         }
         return bookingList;
-   
-}}
+       
+}
+/**
+ * Searches for customers by matching their exact ID or a partial Name string.
+ */
+public java.util.List<Object[]> searchCustomers(String keyword) {
+    java.util.List<Object[]> customerList = new java.util.ArrayList<>();
+    // Look up via numeric ID match OR partial string match on the name column
+    String query = "SELECT id, customer_name, email, phone FROM customers WHERE id = ? OR customer_name LIKE ?";
+
+    try {
+        java.sql.Connection liveConn = com.travelaround.config.DBConnection.getConnection();
+        java.sql.PreparedStatement stmt = liveConn.prepareStatement(query);
+        
+        // Try to check if the keyword is a number for ID matching
+        int idSearch = -1;
+        try {
+            idSearch = Integer.parseInt(keyword);
+        } catch (NumberFormatException e) {
+            // Safe fallback if it's a textual name string
+        }
+
+        stmt.setInt(1, idSearch);
+        stmt.setString(2, "%" + keyword + "%"); // SQL wildcards for flexible searching
+
+        java.sql.ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            customerList.add(new Object[]{
+                rs.getInt("id"),
+                rs.getString("customer_name"),
+                rs.getString("email"),
+                rs.getString("phone")
+            });
+        }
+        
+        rs.close();
+        stmt.close();
+        
+    } catch (java.sql.SQLException e) {
+        System.out.println("Customer search query failure: " + e.getMessage());
+    }
+    return customerList;
+}
+
+     /**
+     * NEW METHOD: Fetches real relational booking information formatted for the customer dashboard columns.
+     */
+    public java.util.List<Object[]> getBookingsByCustomerId(int customerId) {
+        java.util.List<Object[]> bookingDataList = new java.util.ArrayList<>();
+        
+        // This query joins your tables together so we get text names instead of raw IDs
+        String query = "SELECT b.booking_id, h.hotel_name, r.room_type, b.booking_status " +
+                       "FROM bookings b " +
+                       "JOIN rooms r ON b.room_id = r.room_id " +
+                       "JOIN hotels h ON r.hotel_id = h.hotel_id " +
+                       "WHERE b.customer_id = ?";
+
+        try {
+            Connection liveConn = DBConnection.getConnection();
+            PreparedStatement stmt = liveConn.prepareStatement(query);
+            
+            stmt.setInt(1, customerId);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                bookingDataList.add(new Object[]{
+                    rs.getInt("booking_id"),
+                    rs.getString("hotel_name"),
+                    rs.getString("room_type"),
+                    rs.getString("booking_status")
+                });
+            }
+            
+            rs.close();
+            stmt.close();
+            
+        } catch (SQLException e) {
+            System.out.println("Error pulling dashboard dataset: " + e.getMessage());
+        }
+        return bookingDataList;
+    }
+
+}

@@ -20,30 +20,37 @@ public class UserController {
      * Returns a full User object if successful, or null if credentials fail.
      */
     public User loginUser(String username, String password) {
-        String query = "SELECT * FROM Users WHERE username = ? AND password = ?";
+        // Relate users and customers so we can grab profile details instantly
+    String sql = "SELECT u.user_id AS id, u.username, u.role, c.customer_name, c.email, c.phone " +
+             "FROM users u " +
+             "LEFT JOIN customers c ON u.user_id = c.id " + 
+             "WHERE u.username = ? AND u.password = ?";
+                 
+    try (Connection conn = com.travelaround.config.DBConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
         
-        try (PreparedStatement ps = conn.prepareStatement(query)) {
-            ps.setString(1, username);
-            ps.setString(2, password);
-            
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    // Turn database row data into a clean Java Object
-                    return new User(
-                        rs.getInt("user_id"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getString("role")
-                    );
-                }
+        stmt.setString(1, username);
+        stmt.setString(2, password);
+        
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                // Initialize user model with all combined attributes
+                com.travelaround.model.User user = new com.travelaround.model.User();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setRole(rs.getString("role"));
+                user.setCustomerName(rs.getString("customer_name"));
+                user.setEmail(rs.getString("email"));
+                user.setPhone(rs.getString("phone"));
+                return user;
             }
-        } catch (SQLException e) {
-            System.out.println("Login System Error: " + e.getMessage());
         }
-        return null; // Credential verification failed
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return null;
+    }
+    
 
         // Method to count total rows in any given table dynamically
     public int getSystemCount(String tableName) {
