@@ -80,7 +80,8 @@ public class DashboardForm extends javax.swing.JFrame {
         
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     }
-    private void loadCustomerBookingDetails(int customerId) {
+    public void loadCustomerBookingDetails(int customerId) {
+        System.out.println("DEBUG: Loading booking details for Customer ID: " + customerId);
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblCustomers.getModel();
         
         // Match the layout headers exactly
@@ -529,7 +530,20 @@ public class DashboardForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLogoutActionPerformed
 
     private void btnBookRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBookRoomActionPerformed
-        BookingForm bookingScreen = new BookingForm(this.loggedInCustomerId);
+        com.travelaround.model.User userToSend = this.currentUser;
+
+        // If login came through the secondary constructor, construct the User object
+        if (userToSend == null) {
+            userToSend = new com.travelaround.model.User();
+            userToSend.setId(this.loggedInCustomerId);
+            userToSend.setCustomerName(this.loggedInCustomerName);
+            userToSend.setEmail(this.loggedInCustomerEmail);
+            userToSend.setPhone(this.loggedInCustomerPhone);
+            userToSend.setRole("Customer"); 
+        }
+
+        // Pass 'this' (the current DashboardForm) as the second argument!
+        BookingForm bookingScreen = new BookingForm(userToSend, this);
         bookingScreen.setVisible(true);
     }//GEN-LAST:event_btnBookRoomActionPerformed
 

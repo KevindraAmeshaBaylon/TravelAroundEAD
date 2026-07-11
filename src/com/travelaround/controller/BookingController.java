@@ -160,12 +160,11 @@ public java.util.List<Object[]> searchCustomers(String keyword) {
         java.util.List<Object[]> bookingDataList = new java.util.ArrayList<>();
         
         // This query joins your tables together so we get text names instead of raw IDs
-        String query = "SELECT b.booking_id, h.hotel_name, r.room_type, b.booking_status " +
-                       "FROM bookings b " +
-                       "JOIN rooms r ON b.room_id = r.room_id " +
-                       "JOIN hotels h ON r.hotel_id = h.hotel_id " +
-                       "WHERE b.customer_id = ?";
-
+        String query = "SELECT b.booking_id, h.name AS hotel_name, r.room_type, b.booking_status " +
+                        "FROM bookings b " +
+                        "JOIN rooms r ON b.room_id = r.room_id " +
+                        "JOIN hotels h ON r.hotel_id = h.hotel_id " +
+                        "WHERE b.customer_id = ?";
         try {
             Connection liveConn = DBConnection.getConnection();
             PreparedStatement stmt = liveConn.prepareStatement(query);

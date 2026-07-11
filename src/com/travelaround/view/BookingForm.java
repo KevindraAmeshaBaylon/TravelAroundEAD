@@ -7,14 +7,22 @@ public class BookingForm extends javax.swing.JFrame {
     private com.travelaround.controller.BookingController bookingController;
     private com.travelaround.model.User currentUser;
 
+    private DashboardForm parentDashboard;
     /**
      * Creates new form BookingForm tracked to active session
      */
-    public BookingForm(com.travelaround.model.User user) {
+    public BookingForm(com.travelaround.model.User user,DashboardForm dashboard) {
         initComponents();
         this.currentUser = user;
+        this.parentDashboard = dashboard;
         this.bookingController = new com.travelaround.controller.BookingController();
         this.setLocationRelativeTo(null); // Center form smoothly on launch
+        
+        // Auto-display the customer ID right away!
+        if (this.currentUser != null) {
+            txtCustomerID.setText(String.valueOf(this.currentUser.getId()));
+            txtCustomerID.setEditable(false); // Prevents users from changing it manually
+        }
     }
 
     private int currentCustomerId;
@@ -47,6 +55,8 @@ public class BookingForm extends javax.swing.JFrame {
         jPanel5 = new javax.swing.JPanel();
         btnClear = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        txtCustomerID = new javax.swing.JTextField();
+        lblRoomId1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -92,7 +102,7 @@ public class BookingForm extends javax.swing.JFrame {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGap(32, 32, 32)
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 193, Short.MAX_VALUE)
                 .addComponent(btnClear)
                 .addGap(25, 25, 25))
         );
@@ -106,49 +116,60 @@ public class BookingForm extends javax.swing.JFrame {
                 .addContainerGap(11, Short.MAX_VALUE))
         );
 
+        lblRoomId1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblRoomId1.setText("Customer ID :");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
+                .addGap(62, 62, 62)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(62, 62, 62)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(8, 8, 8)
-                                .addComponent(lblRoomId))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(4, 4, 4)
-                                        .addComponent(lblTotalCost)
-                                        .addGap(40, 40, 40))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(tlblCheckIn)
-                                            .addComponent(lblCheckOut))
-                                        .addGap(18, 18, 18)))
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtTotalCost, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtCheckOut, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtCheckIn, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtRoomId, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addGap(8, 8, 8)
+                        .addComponent(lblRoomId))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(112, 112, 112)
+                        .addGap(50, 50, 50)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(btnBack)
                                 .addGap(165, 165, 165))
-                            .addComponent(btnConfirmBooking, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(76, Short.MAX_VALUE))
+                            .addComponent(btnConfirmBooking, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblRoomId1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(134, 134, 134)
+                                .addComponent(txtCustomerID, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGap(4, 4, 4)
+                                    .addComponent(lblTotalCost)
+                                    .addGap(40, 40, 40))
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(tlblCheckIn)
+                                        .addComponent(lblCheckOut))
+                                    .addGap(18, 18, 18)))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(txtTotalCost, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtCheckOut, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtCheckIn, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtRoomId, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblRoomId1)
+                    .addComponent(txtCustomerID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblRoomId)
                     .addComponent(txtRoomId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -168,56 +189,50 @@ public class BookingForm extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnConfirmBooking, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnBack))
-                .addContainerGap(35, Short.MAX_VALUE))
+                .addGap(17, 17, 17))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnConfirmBookingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmBookingActionPerformed
-        String roomIdStr = txtRoomId.getText().trim();
-        String costStr = txtTotalCost.getText().trim();
-        String checkIn = txtCheckIn.getText().trim();
-        String checkOut = txtCheckOut.getText().trim();
-
-        if (roomIdStr.isEmpty() || costStr.isEmpty() || checkIn.isEmpty() || checkOut.isEmpty() 
-                || checkIn.equalsIgnoreCase("YYYY-MM-DD") || checkOut.equalsIgnoreCase("YYYY-MM-DD")) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Please supply all processing fields with valid data.");
-            return;
-        }
-
-        // Validate date layout structures before processing transactions
-        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd");
         try {
-            java.time.LocalDate.parse(checkIn, formatter);
-            java.time.LocalDate.parse(checkOut, formatter);
-        } catch (java.time.format.DateTimeParseException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Dates must match the exact layout requested (YYYY-MM-DD).", "Format Input Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+            // 1. Grab the ID directly from our tracked user instance
+            int currentCustomerId = this.currentUser.getId(); 
+            
+            // 2. Pull the rest of the values from your UI fields
+            int selectedRoomId = Integer.parseInt(txtRoomId.getText().trim());
+            double cost = Double.parseDouble(txtTotalCost.getText().trim());
+            String checkIn = txtCheckIn.getText().trim();
+            String checkOut = txtCheckOut.getText().trim();
 
-        try {
-            int roomId = Integer.parseInt(roomIdStr);
-            double cost = Double.parseDouble(costStr);
-            
-            // Derive active customer context dynamically or fall back to 1 safely
-            int userId = (currentUser != null) ? currentUser.getId() : 1;
-            System.out.println("DEBUGGING: The Booking System is attempting to use Customer ID = " + userId);
-            
-            // Execute structural database booking transactional workflow
-            boolean success = bookingController.processRoomBooking(userId, roomId, checkIn, checkOut, cost);
+            // 3. Call the correct controller method with matching parameters
+            boolean success = this.bookingController.processRoomBooking(currentCustomerId, selectedRoomId, checkIn, checkOut, cost);
             
             if (success) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Booking Transaction Confirmed! Invoice generated successfully.");
-                btnClearActionPerformed(null); // Wipe fields clean on success
-            } else {
-                javax.swing.JOptionPane.showMessageDialog(this, "Processing failed. Please check that Room ID exists and is available.", "Database Error", javax.swing.JOptionPane.WARNING_MESSAGE);
+                javax.swing.JOptionPane.showMessageDialog(this, "Booking successfully created!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                
+                // FORCE THE REFRESH USING THE ACTIVE ID FROM THE TEXT FIELD
+                if (this.parentDashboard != null) {
+                    try {
+                        int activeCustomerId = Integer.parseInt(txtCustomerID.getText().trim());
+                        this.parentDashboard.loadCustomerBookingDetails(activeCustomerId);
+                    } catch (NumberFormatException e) {
+                        // Fallback just in case
+                        if (this.currentUser != null) {
+                            this.parentDashboard.loadCustomerBookingDetails(this.currentUser.getId());
+                        }
+                    }
+                }
+                
+                this.dispose(); // Close the booking popup
             }
-            
-        } catch (NumberFormatException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Invalid numerical entry parsed for Room ID or Total Price.", "Input Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         } catch (com.travelaround.exception.RoomUnavailableException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Reservation Conflict Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Room Unavailable", javax.swing.JOptionPane.WARNING_MESSAGE);
+        } catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Please ensure Room ID and Price are valid numbers.", "Input Error", javax.swing.JOptionPane.WARNING_MESSAGE);
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnConfirmBookingActionPerformed
 
@@ -239,10 +254,12 @@ public class BookingForm extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JLabel lblCheckOut;
     private javax.swing.JLabel lblRoomId;
+    private javax.swing.JLabel lblRoomId1;
     private javax.swing.JLabel lblTotalCost;
     private javax.swing.JLabel tlblCheckIn;
     private javax.swing.JTextField txtCheckIn;
     private javax.swing.JTextField txtCheckOut;
+    private javax.swing.JTextField txtCustomerID;
     private javax.swing.JTextField txtRoomId;
     private javax.swing.JTextField txtTotalCost;
     // End of variables declaration//GEN-END:variables
