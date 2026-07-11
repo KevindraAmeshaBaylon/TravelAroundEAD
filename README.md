@@ -13,6 +13,10 @@ An enterprise-grade Java Swing desktop application developed for the hospitality
 * **Error Resilience & Validation:** Enforces input numerical validation, type parsing mismatch catch frames, and utilizes a user-defined custom exception structure (`RoomUnavailableException`).
 
 ---
+## 📺 Project Presentation & Demo Video
+Click the link below to watch the full system walkthrough and execution video:
+
+👉 **[Watch the System Demo Video Here](https://drive.google.com/file/d/1WYWv6t3T8TfL0kS-HP4d7s9aaX8XJC_2/view?usp=sharing)**
 
 ## 🛠️ Project Structure
 
