@@ -15,6 +15,9 @@ public class BookingForm extends javax.swing.JFrame {
         initComponents();
         this.currentUser = user;
         this.parentDashboard = dashboard;
+        
+        populateRoomDropdown();
+        
         this.bookingController = new com.travelaround.controller.BookingController();
         this.setLocationRelativeTo(null); // Center form smoothly on launch
         
@@ -33,6 +36,41 @@ public class BookingForm extends javax.swing.JFrame {
         this.bookingController = new com.travelaround.controller.BookingController();
         this.setLocationRelativeTo(null);
     }
+    
+    private void populateRoomDropdown() {
+        cmbRoomSelection.removeAllItems();
+        java.sql.Connection conn = null;
+        java.sql.PreparedStatement pstmt = null;
+        java.sql.ResultSet rs = null;
+        
+        try {
+            conn = com.travelaround.config.DBConnection.getConnection();
+            String sql = "SELECT r.room_id, h.name, r.room_type, r.price_per_night " +
+                         "FROM rooms r JOIN hotels h ON r.hotel_id = h.hotel_id " +
+                         "WHERE r.status = 'Available'";
+            
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                int id = rs.getInt("room_id");
+                String hotelName = rs.getString("name");
+                String type = rs.getString("room_type");
+                double price = rs.getDouble("price_per_night");
+                
+                // FIXED: This now puts the ID explicitly at the front so parsing works 100% of the time!
+                String itemString = "ID: " + id + " | " + hotelName + " - " + type + " ($" + price + ")";
+                cmbRoomSelection.addItem(itemString);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try { if (rs != null) rs.close(); } catch (Exception e) {}
+            try { if (pstmt != null) pstmt.close(); } catch (Exception e) {}
+            try { if (conn != null) conn.close(); } catch (Exception e) {}
+        }
+   
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -47,7 +85,6 @@ public class BookingForm extends javax.swing.JFrame {
         tlblCheckIn = new javax.swing.JLabel();
         lblCheckOut = new javax.swing.JLabel();
         btnConfirmBooking = new javax.swing.JButton();
-        txtRoomId = new javax.swing.JTextField();
         txtTotalCost = new javax.swing.JTextField();
         txtCheckIn = new javax.swing.JTextField();
         txtCheckOut = new javax.swing.JTextField();
@@ -57,28 +94,43 @@ public class BookingForm extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         txtCustomerID = new javax.swing.JTextField();
         lblRoomId1 = new javax.swing.JLabel();
+        cmbRoomSelection = new javax.swing.JComboBox<>();
+        tlblCheckIn1 = new javax.swing.JLabel();
+        tlblCheckIn2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         lblRoomId.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblRoomId.setText("Room ID :");
+        lblRoomId.setText("Hotel:");
 
         lblTotalCost.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblTotalCost.setText("Total Price Field : ");
 
         tlblCheckIn.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        tlblCheckIn.setText("Check-In Date Field :");
+        tlblCheckIn.setText("Check-In Date  :");
 
         lblCheckOut.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblCheckOut.setText("Check-Out Date Field :");
+        lblCheckOut.setText("Check-Out Date :");
 
         btnConfirmBooking.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnConfirmBooking.setText("Confirm");
         btnConfirmBooking.addActionListener(this::btnConfirmBookingActionPerformed);
 
-        txtCheckIn.setText("YYYY-MM-DD");
+        txtTotalCost.setEditable(false);
 
-        txtCheckOut.setText("YYYY-MM-DD");
+        txtCheckIn.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtCheckInFocusLost(evt);
+            }
+        });
+        txtCheckIn.addActionListener(this::txtCheckInActionPerformed);
+
+        txtCheckOut.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtCheckOutFocusLost(evt);
+            }
+        });
+        txtCheckOut.addActionListener(this::txtCheckOutActionPerformed);
 
         btnBack.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnBack.setText("Back");
@@ -102,9 +154,9 @@ public class BookingForm extends javax.swing.JFrame {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGap(32, 32, 32)
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 193, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnClear)
-                .addGap(25, 25, 25))
+                .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -116,8 +168,18 @@ public class BookingForm extends javax.swing.JFrame {
                 .addContainerGap(11, Short.MAX_VALUE))
         );
 
+        txtCustomerID.setEditable(false);
+
         lblRoomId1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblRoomId1.setText("Customer ID :");
+
+        cmbRoomSelection.addActionListener(this::cmbRoomSelectionActionPerformed);
+
+        tlblCheckIn1.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        tlblCheckIn1.setText("(YYYY-MM-DD)");
+
+        tlblCheckIn2.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        tlblCheckIn2.setText("(YYYY-MM-DD)");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -125,71 +187,74 @@ public class BookingForm extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addGap(62, 62, 62)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(8, 8, 8)
-                        .addComponent(lblRoomId))
+                        .addGap(88, 88, 88)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(tlblCheckIn2)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblTotalCost)
+                                .addGap(32, 32, 32)
+                                .addComponent(txtTotalCost, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(lblCheckOut)
+                                            .addComponent(tlblCheckIn)
+                                            .addComponent(tlblCheckIn1))
+                                        .addGap(36, 36, 36))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblRoomId1)
+                                        .addGap(53, 53, 53)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtCustomerID, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtCheckIn, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtCheckOut, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cmbRoomSelection, javax.swing.GroupLayout.PREFERRED_SIZE, 277, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(lblRoomId)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(50, 50, 50)
+                        .addGap(118, 118, 118)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(btnBack)
                                 .addGap(165, 165, 165))
-                            .addComponent(btnConfirmBooking, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblRoomId1)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(134, 134, 134)
-                                .addComponent(txtCustomerID, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addGap(4, 4, 4)
-                                    .addComponent(lblTotalCost)
-                                    .addGap(40, 40, 40))
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(tlblCheckIn)
-                                        .addComponent(lblCheckOut))
-                                    .addGap(18, 18, 18)))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txtTotalCost, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txtCheckOut, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txtCheckIn, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txtRoomId, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                            .addComponent(btnConfirmBooking, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblRoomId1)
                     .addComponent(txtCustomerID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblRoomId)
-                    .addComponent(txtRoomId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cmbRoomSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tlblCheckIn)
+                    .addComponent(txtCheckIn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tlblCheckIn1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtCheckOut, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblCheckOut))
+                .addGap(8, 8, 8)
+                .addComponent(tlblCheckIn2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblTotalCost)
                     .addComponent(txtTotalCost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtCheckIn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tlblCheckIn))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtCheckOut, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblCheckOut))
-                .addGap(28, 28, 28)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnConfirmBooking, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnBack))
-                .addGap(17, 17, 17))
+                .addGap(21, 21, 21))
         );
 
         pack();
@@ -197,40 +262,53 @@ public class BookingForm extends javax.swing.JFrame {
 
     private void btnConfirmBookingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmBookingActionPerformed
         try {
-            // 1. Grab the ID directly from our tracked user instance
             int currentCustomerId = this.currentUser.getId(); 
             
-            // 2. Pull the rest of the values from your UI fields
-            int selectedRoomId = Integer.parseInt(txtRoomId.getText().trim());
-            double cost = Double.parseDouble(txtTotalCost.getText().trim());
+            String selectedRoomString = (String) cmbRoomSelection.getSelectedItem();
+            if (selectedRoomString == null) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Please select a hotel/room.", "Input Error", javax.swing.JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int roomId;
+            double totalPrice;
+
+            try {
+                // Completely safe parsing step matching our updated string format
+                String idPart = selectedRoomString.split("\\|")[0].replace("ID:", "").trim();
+                roomId = Integer.parseInt(idPart);
+
+                // Read the calculated total price field cleanly
+                totalPrice = Double.parseDouble(txtTotalCost.getText().trim());
+
+            } catch (Exception e) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Please ensure Room ID and Price are valid numbers.", "Input Error", javax.swing.JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
             String checkIn = txtCheckIn.getText().trim();
             String checkOut = txtCheckOut.getText().trim();
 
-            // 3. Call the correct controller method with matching parameters
-            boolean success = this.bookingController.processRoomBooking(currentCustomerId, selectedRoomId, checkIn, checkOut, cost);
+            boolean success = this.bookingController.processRoomBooking(currentCustomerId, roomId, checkIn, checkOut, totalPrice);
             
             if (success) {
                 javax.swing.JOptionPane.showMessageDialog(this, "Booking successfully created!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
                 
-                // FORCE THE REFRESH USING THE ACTIVE ID FROM THE TEXT FIELD
                 if (this.parentDashboard != null) {
                     try {
                         int activeCustomerId = Integer.parseInt(txtCustomerID.getText().trim());
                         this.parentDashboard.loadCustomerBookingDetails(activeCustomerId);
-                    } catch (NumberFormatException e) {
-                        // Fallback just in case
+                    } catch (Exception e) {
                         if (this.currentUser != null) {
                             this.parentDashboard.loadCustomerBookingDetails(this.currentUser.getId());
                         }
                     }
                 }
                 
-                this.dispose(); // Close the booking popup
+                this.dispose(); 
             }
         } catch (com.travelaround.exception.RoomUnavailableException e) {
             javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Room Unavailable", javax.swing.JOptionPane.WARNING_MESSAGE);
-        } catch (NumberFormatException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Please ensure Room ID and Price are valid numbers.", "Input Error", javax.swing.JOptionPane.WARNING_MESSAGE);
         } catch (Exception e) {
             javax.swing.JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
@@ -241,15 +319,79 @@ public class BookingForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnBackActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
-        txtRoomId.setText("");
+        
+        // Reset the combo box back to the first available room option
+        if (cmbRoomSelection.getItemCount() > 0) {
+            cmbRoomSelection.setSelectedIndex(0);
+        }
+        
+        // Clear out the rest of the text inputs
         txtTotalCost.setText("");
         txtCheckIn.setText("");
         txtCheckOut.setText("");    }//GEN-LAST:event_btnClearActionPerformed
+
+    private void cmbRoomSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbRoomSelectionActionPerformed
+        String selectedRoomString = (String) cmbRoomSelection.getSelectedItem();
+        if (selectedRoomString != null && selectedRoomString.contains("($")) {
+            try {
+                // 1. Extract the base per-night rate from the database string log
+                String priceParts = selectedRoomString.substring(selectedRoomString.lastIndexOf("($") + 2, selectedRoomString.lastIndexOf(")"));
+                double pricePerNight = Double.parseDouble(priceParts);
+
+                String checkInStr = txtCheckIn.getText().trim();
+                String checkOutStr = txtCheckOut.getText().trim();
+
+                // 2. Compute dynamic duration if dates have been customized away from baseline hint text
+                if (!checkInStr.isEmpty() && !checkInStr.equals("YYYY-MM-DD") && 
+                    !checkOutStr.isEmpty() && !checkOutStr.equals("YYYY-MM-DD")) {
+
+                    java.time.LocalDate d1 = java.time.LocalDate.parse(checkInStr);
+                    java.time.LocalDate d2 = java.time.LocalDate.parse(checkOutStr);
+                    long nights = java.time.temporal.ChronoUnit.DAYS.between(d1, d2);
+
+                    if (nights > 0) {
+                        // Total Cost = Room Rate * Stayed Nights
+                        txtTotalCost.setText(String.format("%.2f", pricePerNight * nights));
+                        return; 
+                    }
+                }
+
+                // Default baseline show if date structure isn't entered or complete yet
+                txtTotalCost.setText(String.format("%.2f", pricePerNight));
+
+            } catch (Exception e) {
+                // Quietly display baseline fallback rate if date values are mid-typing layout patterns
+                try {
+                    String priceParts = selectedRoomString.substring(selectedRoomString.lastIndexOf("($") + 2, selectedRoomString.lastIndexOf(")"));
+                    txtTotalCost.setText(String.format("%.2f", Double.parseDouble(priceParts)));
+                } catch(Exception ex) {
+                    txtTotalCost.setText("");
+                }
+            }
+        }
+    }//GEN-LAST:event_cmbRoomSelectionActionPerformed
+
+    private void txtCheckOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCheckOutActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCheckOutActionPerformed
+
+    private void txtCheckInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCheckInActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCheckInActionPerformed
+
+    private void txtCheckInFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCheckInFocusLost
+        cmbRoomSelectionActionPerformed(null);
+    }//GEN-LAST:event_txtCheckInFocusLost
+
+    private void txtCheckOutFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCheckOutFocusLost
+        cmbRoomSelectionActionPerformed(null);
+    }//GEN-LAST:event_txtCheckOutFocusLost
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnClear;
     private javax.swing.JButton btnConfirmBooking;
+    private javax.swing.JComboBox<String> cmbRoomSelection;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JLabel lblCheckOut;
@@ -257,10 +399,11 @@ public class BookingForm extends javax.swing.JFrame {
     private javax.swing.JLabel lblRoomId1;
     private javax.swing.JLabel lblTotalCost;
     private javax.swing.JLabel tlblCheckIn;
+    private javax.swing.JLabel tlblCheckIn1;
+    private javax.swing.JLabel tlblCheckIn2;
     private javax.swing.JTextField txtCheckIn;
     private javax.swing.JTextField txtCheckOut;
     private javax.swing.JTextField txtCustomerID;
-    private javax.swing.JTextField txtRoomId;
     private javax.swing.JTextField txtTotalCost;
     // End of variables declaration//GEN-END:variables
 }
